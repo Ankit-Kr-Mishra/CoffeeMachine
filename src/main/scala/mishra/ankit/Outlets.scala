@@ -13,7 +13,7 @@ class Outlets(numOutlets: Int) {
   private val beverageServer = Executors.newFixedThreadPool(numOutlets)
 
   /**
-   *
+   * submits the beverage dispensing task to beverageServer
    * @param beverage beverage to be served
    */
   def dispense(beverage: Beverage): Unit = {

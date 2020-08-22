@@ -50,7 +50,9 @@ class CoffeeMachine(numOutlets: Int) {
    */
   def dispenseBeverage(beverage: Beverage): Unit = {
     checkAndConsumeAmount(beverage)
+    println(s"${beverage.name} is being prepared. It will take ${beverage.getTimeToPrepare}s")
     outlets.dispense(beverage)
+    //this shouldn't add to latency. So, indicator has been kept asynchronous
     indicator.execute(() => Indicator.indicate(availableIngredients))
   }
 
@@ -68,25 +70,25 @@ class CoffeeMachine(numOutlets: Int) {
     val requiredIngredients = beverage.ingredients
 
     //check if every required ingredient is available
-    for (requiredIngredientAmount <- requiredIngredients) {
-      if (!availableIngredients.contains(requiredIngredientAmount.ingredient)) {
+    requiredIngredients.foreach( p => {
+      if(!availableIngredients.contains(p._1)) {
         throw IngredientNotAvailableException(s"${beverage.name} cannot be prepared because " +
-          s"${requiredIngredientAmount.ingredient.name} is not available", requiredIngredientAmount.ingredient.name)
+          s"${p._1.name} is not available", p._1.name)
       }
-    }
+    })
 
     //check if every required ingredient is available in sufficient amount
-    for (requiredIngredientAmount <- requiredIngredients) {
-      if (!availableIngredients(requiredIngredientAmount.ingredient).ableToDispense(requiredIngredientAmount.getAmount)) {
+    requiredIngredients.foreach( p => {
+      if (!availableIngredients(p._1).ableToDispense(p._2)) {
         throw InsufficientIngredientAmountException(s"${beverage.name} cannot be prepared because item" +
-          s" ${requiredIngredientAmount.ingredient.name} is not sufficient")
+          s" ${p._1.name} is not sufficient")
       }
-    }
+    })
 
     //consume amounts of ingredients required for this beverage
-    for (requiredIngredientAmount <- requiredIngredients) {
-      availableIngredients(requiredIngredientAmount.ingredient).consume(requiredIngredientAmount.getAmount)
-    }
+    requiredIngredients.foreach( p => {
+      availableIngredients(p._1).consume(p._2)
+    })
   }
 
   /**

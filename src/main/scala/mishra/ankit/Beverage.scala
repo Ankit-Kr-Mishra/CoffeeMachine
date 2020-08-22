@@ -1,11 +1,14 @@
 package mishra.ankit
 
+import scala.collection.immutable.HashMap
+
 /**
  * Created by AnX on 22/08/20
  */
-case class Beverage(name: String, ingredients: Traversable[IngredientAmount]) {
+case class Beverage(name: String, ingredients: HashMap[Ingredient, Int]) {
 
-  def this(name: String, ingredients: Traversable[IngredientAmount], timeToPrepareInSeconds: Int) = {
+  // this constructor will be used to give custom timeToPrepare to a beverage
+  def this(name: String, ingredients: HashMap[Ingredient, Int], timeToPrepareInSeconds: Int) = {
     this(name, ingredients)
     this.setTimeToPrepare(timeToPrepareInSeconds)
   }

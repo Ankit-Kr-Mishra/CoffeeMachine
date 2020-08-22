@@ -1,6 +1,6 @@
 package mishra.ankit
 
-import mishra.ankit.TestObjectsUtil._
+import mishra.ankit.ObjectsUtil._
 import mishra.ankit.exceptions.{IngredientNotAvailableException, InsufficientIngredientAmountException}
 import org.junit.jupiter.api.Assertions.{assertDoesNotThrow, assertFalse, assertThrows, assertTrue}
 import org.junit.jupiter.api.function.Executable
@@ -22,10 +22,15 @@ class CoffeeMachineTest {
   @Test
   def testCheckAndConsumeAmount1(): Unit = {
     assertThrows(classOf[IngredientNotAvailableException], () => machine.dispenseBeverage(hotTea))
+    machine.addIngredientInBulk(Traversable(
+      new IngredientAmount(hotWater, 200),
+      new IngredientAmount(hotMilk, 100),
+      new IngredientAmount(gingerSyrup, 10),
+      new IngredientAmount(sugarSyrup, 10)))
     try{
       machine.dispenseBeverage(hotTea)
     } catch {
-      case e: IngredientNotAvailableException => assertTrue(e.ingredientName.equals("hot_water"))
+      case e: IngredientNotAvailableException => assertTrue(e.ingredientName.equals(teaLeavesSyrup.name))
     }
   }
   
@@ -41,6 +46,12 @@ class CoffeeMachineTest {
     assertDoesNotThrow(new Executable {
       override def execute(): Unit = machine.dispenseBeverage(hotTea)
     })
+    val availableIngredients = machine.getAvailableIngredients
+    assertTrue(availableIngredients(hotWater).getAmount == 200 - hotTea.ingredients(hotWater))
+    assertTrue(availableIngredients(hotMilk).getAmount == 100 - hotTea.ingredients(hotMilk))
+    assertTrue(availableIngredients(gingerSyrup).getAmount == 10 - hotTea.ingredients(gingerSyrup))
+    assertTrue(availableIngredients(sugarSyrup).getAmount == 10 - hotTea.ingredients(sugarSyrup))
+    assertTrue(availableIngredients(teaLeavesSyrup).getAmount == 30 - hotTea.ingredients(teaLeavesSyrup))
   }
 
   @DisplayName("test checkAndConsumeAmount() throws InsufficientIngredientAmountException")

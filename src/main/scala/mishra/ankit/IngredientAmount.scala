@@ -5,6 +5,12 @@ import java.util.concurrent.atomic.AtomicInteger
 /**
  * Created by AnX on 22/08/20
  */
+/**
+ * CoffeeMachine will store ingredients using this wrapper.
+ * So that consumption and addition can be handle atomically.
+ * @param ingredient ingredient
+ * @param amount amount
+ */
 class IngredientAmount(val ingredient: Ingredient, private val amount: Int) {
 
   private val currentAmount: AtomicInteger = new AtomicInteger(amount)
